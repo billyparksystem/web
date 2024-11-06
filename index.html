@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO 최적화 테스트</title>
+    <meta name="description" content="SEO 최적화 상태를 분석하여 개선 방법을 제공합니다. 사이트 주소를 입력하고 SEO 점수를 확인하세요.">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>SEO 최적화 테스트</h1>
+            <p>사이트 주소를 입력하고 SEO 최적화 상태를 확인하세요.</p>
+        </header>
+        
+        <main>
+            <div class="search-box">
+                <input type="text" id="urlInput" placeholder="웹사이트 주소를 입력하세요 (예: https://example.com)" onkeypress="handleKeyPress(event)">
+                <button onclick="analyzeSEO()">분석하기</button>
+            </div>
+            
+            <div id="result" class="result">
+                <!-- 분석 결과가 테이블 형식으로 표시될 곳 -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                analyzeSEO();
+            }
+        }
+
+        async function analyzeSEO() {
+            const url = document.getElementById('urlInput').value;
+            if (url) {
+                try {
+                    const response = await fetch('https://foxstock88.pythonanywhere.com/analyze', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ url })
+                    });
+                    const data = await response.json();
+
+                    if (data.error) {
+                        document.getElementById('result').innerHTML = `<p>오류: ${data.error}</p>`;
+                    } else {
+                        document.getElementById('result').innerHTML = `
+                            <table>
+                                <tr><th colspan="2">SEO 최적화 점수</th></tr>
+                                <tr><td>최적화 점수</td><td><span class="score">${data.score}/100</span></td></tr>
+                                <tr><td colspan="2">${data.score_text}</td></tr>
+                                <tr><td colspan="2">
+                                    <strong>점수 평가 기준:</strong><br>
+                                    <span class="high-score">90-100점</span>: 최적화가 매우 잘 되어 있습니다.<br>
+                                    <span class="good-score">80-89점</span>: 양호한 최적화 상태입니다.<br>
+                                    <span class="fair-score">60-79점</span>: 개선할 부분이 있지만 괜찮은 상태입니다.<br>
+                                    <span class="poor-score">40-59점</span>: 개선이 필요합니다.<br>
+                                    <span class="critical-score">0-39점</span>: 심각한 최적화 문제가 있습니다. 즉각적인 개선이 필요합니다.
+                                </td></tr>
+                                <tr><th colspan="2">메타 태그 분석</th></tr>
+                                <tr><td>Title</td><td>${data.title}</td></tr>
+                                <tr><td>Description</td><td>${data.description}</td></tr>
+                                <tr><td>Keywords</td><td>${data.keywords}</td></tr>
+                                <tr><th colspan="2">이미지 Alt 태그 분석</th></tr>
+                                <tr><td>Alt 태그가 있는 이미지 개수</td><td>${data.alt_tag_count}</td></tr>
+                                <tr><th colspan="2">Canonical 태그</th></tr>
+                                <tr><td>Canonical 태그</td><td>${data.canonical_status}</td></tr>
+                                <tr><th colspan="2">SSL 인증서</th></tr>
+                                <tr><td>SSL 상태</td><td>${data.ssl_status}</td></tr>
+                                <tr><th colspan="2">모바일 친화성</th></tr>
+                                <tr><td>모바일 친화성</td><td>${data.mobile_friendly}</td></tr>
+                                <tr><th colspan="2">페이지 로딩 시간</th></tr>
+                                <tr><td>페이지 로딩 시간</td><td>${data.response_time}</td></tr>
+                                <tr><th colspan="2">콘텐츠 길이</th></tr>
+                                <tr><td>콘텐츠 길이</td><td>${data.content_length}</td></tr>
+                                <tr><th colspan="2">네트워크 요청 수</th></tr>
+                                <tr><td>요청 수</td><td>${data.cta_count}</td></tr>
+                                <tr><th colspan="2">커스텀 404 페이지</th></tr>
+                                <tr><td>커스텀 404 페이지</td><td>${data.custom_404}</td></tr>
+                                <tr><th colspan="2">내부 링크</th></tr>
+                                <tr><td>내부 링크 수</td><td>${data.internal_links}</td></tr>
+                                <tr><th colspan="2">외부 링크</th></tr>
+                                <tr><td>외부 링크 수</td><td>${data.external_links}</td></tr>
+                                <tr><th colspan="2">소셜 미디어 메타 태그</th></tr>
+                                <tr><td>소셜 미디어 메타 태그 상태</td><td>${data.social_media_meta}</td></tr>
+                                <tr><th colspan="2">페이지 언어 설정</th></tr>
+                                <tr><td>언어 설정</td><td>${data.language}</td></tr>
+                                <tr><th colspan="2">중복 콘텐츠 확인</th></tr>
+                                <tr><td>중복 콘텐츠</td><td>${data.duplicate_content}</td></tr>
+                                <tr><th colspan="2">개선사항</th></tr>
+                                <tr><td colspan="2">${recommendationsHTML}</td></tr>
+                            </table>
+                        `;
+                    }
+                } catch (error) {
+                    document.getElementById('result').innerHTML = `<p>오류: ${error.message}</p>`;
+                }
+            } else {
+                alert('웹사이트 주소를 입력해주세요.');
+            }
+        }
+    </script>
+
+    <style>
+        /* 기본 스타일 */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            background-color: #ffffff;
+            padding: 3rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            max-width: 700px;
+            width: 100%;
+            margin-top: 5%;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            color: #333;
+        }
+
+        header p {
+            color: #666;
+            font-size: 1.2rem;
+        }
+
+        .search-box {
+            margin-top: 2rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .search-box input[type="text"] {
+            padding: 1.2rem;
+            font-size: 1.3rem;
+            border: 5px solid #0073e6;
+            border-radius: 6px;
+            flex-grow: 1;
+            outline: none;
+        }
+
+        .search-box button {
+            padding: 1.2rem 1.5rem;
+            font-size: 1.3rem;
+            background-color: #0073e6;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .search-box button:hover {
+            background-color: #005bb5;
+        }
+
+        .result {
+            margin-top: 2rem;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+        }
+
+        th, td {
+            padding: 0.4rem;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .score {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2e8b57;
+        }
+
+        .high-score { color: #2e8b57; }
+        .good-score { color: #4682b4; }
+        .fair-score { color: #d4a017; }
+        .poor-score { color: #d2691e; }
+        .critical-score { color: #b22222; }
+    </style>
+</body>
+</html>

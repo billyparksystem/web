@@ -1,11 +1,11 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS  # CORS 임포트
+from flask_cors import CORS
 from bs4 import BeautifulSoup
 import requests
 import time
 
 app = Flask(__name__)
-CORS(app)  # 모든 도메인에서 요청을 허용하도록 CORS 적용
+CORS(app, resources={r"/*": {"origins": "*"}})  # 모든 도메인에서 요청 허용
 
 # 기본 경로('/') 처리 추가
 @app.route('/')

@@ -2,6 +2,8 @@ Flask==2.1.1
 gunicorn==20.1.0
 Werkzeug==2.0.3
 flask_cors==3.0.10
-beautifulsoup4==4.11.1  # bs4 패키지 추가
+beautifulsoup4==4.11.1
+requests==2.26.0  # requests 라이브러리 추가
+
 
 

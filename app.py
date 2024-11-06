@@ -3,9 +3,13 @@ from flask_cors import CORS
 from bs4 import BeautifulSoup
 import requests
 import time
+import logging
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})  # 모든 도메인에서 요청 허용
+
+# 로깅 설정 추가
+logging.basicConfig(level=logging.INFO)
 
 # 기본 경로('/') 처리 추가
 @app.route('/')
@@ -100,9 +104,11 @@ def analyze():
         url = 'https://' + url
 
     try:
+        app.logger.info("분석 요청 시작")
         start_time = time.time()
-        response = requests.get(url)
+        response = requests.get(url, timeout=5)  # 타임아웃을 5초로 설정
         response_time = time.time() - start_time
+        app.logger.info(f"응답 시간: {response_time:.2f}초")  # 응답 시간 로그
         soup = BeautifulSoup(response.text, 'html.parser')
         
         title = soup.title.string if soup.title else "없음"
@@ -158,9 +164,11 @@ def analyze():
         data["score_text"] = get_score_text(score)
         data["recommendations"] = recommendations
 
+        app.logger.info("분석 완료")
         return jsonify(data)
 
     except Exception as e:
+        app.logger.error(f"오류 발생: {str(e)}")  # 오류 발생 시 로그
         return jsonify({"error": str(e)})
 
 if __name__ == '__main__':

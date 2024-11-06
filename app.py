@@ -7,6 +7,11 @@ import time
 app = Flask(__name__)
 CORS(app)  # 모든 도메인에서 요청을 허용하도록 CORS 적용
 
+# 기본 경로('/') 처리 추가
+@app.route('/')
+def home():
+    return jsonify(message="Welcome to the SEO Analyzer API!")
+
 def calculate_seo_score(data):
     score = 0
     recommendations = []
